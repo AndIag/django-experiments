@@ -3,7 +3,8 @@ import os
 import time
 
 from django.test import TestCase
-from imageExperiment.models import ImageKit, StdImage
+
+from imageApp.models import ImageKit, StdImage
 
 logger = logging.getLogger(__name__)
 

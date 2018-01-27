@@ -18,4 +18,4 @@ class ImageKit(models.Model):
 
 class StdImage(models.Model):
     image = StdImageField(upload_to=get_image_path,
-                          variations={'thumbnail': {'width': 200, 'height': 200}})
+                          variations={'thumbnail': {'width': 200, 'height': 200, 'crop': True}})

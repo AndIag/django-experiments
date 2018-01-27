@@ -15,13 +15,12 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'imageExperiment.apps.ImageExperimentConfig',
+    'imageApp.apps.ImageAppConfig',
     'imagekit',
     'stdimage',
 ]
@@ -36,7 +35,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'djangoImages.urls'
+ROOT_URLCONF = 'dImages.urls'
 
 TEMPLATES = [
     {
@@ -55,7 +54,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'djangoImages.wsgi.application'
+WSGI_APPLICATION = 'dImages.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
