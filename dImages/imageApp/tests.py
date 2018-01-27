@@ -3,7 +3,9 @@ import os
 import time
 
 from django.test import TestCase
+from tabulate import tabulate
 
+from dImages import settings
 from imageApp.models import ImageKit, StdImage
 
 logger = logging.getLogger(__name__)
@@ -19,75 +21,47 @@ def clean_folder(folder):
         os.removedirs(folder)
 
 
-class TestImageKitView(TestCase):
+class TestImagesView(TestCase):
 
-    def test_view_create_city4k(self):
-        imagekit = ImageKit.objects.create()
-        start = time.time()
-        imagekit.image.save('city4k.jpg', open('static/images/city4k.jpg', 'rb'))
-        imagekit.thumbnail.save('city4k.jpg', open('static/images/city4k.jpg', 'rb'))
-        end = time.time()
-        print('{}.{} time {}'.format(__class__.__name__, 'test_view_create_city4k', end - start))
+    def setUp(self):
+        self.root = 'static'
+        self.media_root = settings.MEDIA_ROOT
+        self.images = os.listdir(self.root)
+        self.data = []
 
-    def test_view_create_lion4k(self):
-        imagekit = ImageKit.objects.create()
-        start = time.time()
-        imagekit.image.save('lion4k.jpg', open('static/images/lion4k.jpg', 'rb'))
-        imagekit.thumbnail.save('lion4k.jpg', open('static/images/lion4k.jpg', 'rb'))
-        end = time.time()
-        print('{}.{} time {}'.format(__class__.__name__, 'test_view_create_lion4k', end - start))
+    def test_imagekit(self):
+        test_name = '{}.{}'.format(__class__.__name__, 'test_imagekit')
+        data = []
+        for image in self.images:
+            path = os.path.join(self.root, image)
+            image_file = open(path, 'rb')
 
-    def test_view_create_machine4k(self):
-        imagekit = ImageKit.objects.create()
-        start = time.time()
-        imagekit.image.save('machine4k.png', open('static/images/machine4k.png', 'rb'))
-        imagekit.thumbnail.save('machine4k.png', open('static/images/machine4k.png', 'rb'))
-        end = time.time()
-        print('{}.{} time {}'.format(__class__.__name__, 'test_view_create_machine4k', end - start))
+            imagekit = ImageKit.objects.create()
+            start = time.time()
+            imagekit.image.save(image, image_file)
+            imagekit.thumbnail.save(image, image_file)
+            end = time.time()
 
-    def test_view_create_colored_frog(self):
-        imagekit = ImageKit.objects.create()
-        start = time.time()
-        imagekit.image.save('colored_frog.jpg', open('static/images/colored_frog.jpg', 'rb'))
-        imagekit.thumbnail.save('colored_frog.jpg', open('static/images/colored_frog.jpg', 'rb'))
-        end = time.time()
-        print('{}.{} time {}'.format(__class__.__name__, 'test_view_create_colored_frog', end - start))
+            new_path = os.path.join(self.media_root, imagekit.thumbnail.url)
+            data.append([test_name, image, end - start, os.path.getsize(path), os.path.getsize(new_path)])
+        print(tabulate(data, headers=['Test', 'ImageName', 'Time', 'Size', 'New Size'], tablefmt='orgtbl'))
 
-    def tearDown(self):
-        super(TestImageKitView, self).tearDown()
-        clean_folder('media')
+    def test_stdimage(self):
+        test_name = '{}.{}'.format(__class__.__name__, 'test_stdimage')
+        data = []
+        for image in self.images:
+            path = os.path.join(self.root, image)
+            image_file = open(path, 'rb')
 
+            stdimage = StdImage.objects.create()
+            start = time.time()
+            stdimage.image.save(image, image_file)
+            end = time.time()
 
-class TestStdImageView(TestCase):
-
-    def test_view_create_city4k(self):
-        stdimage = StdImage.objects.create()
-        start = time.time()
-        stdimage.image.save('city4k.jpg', open('static/images/city4k.jpg', 'rb'))
-        end = time.time()
-        print('{}.{} time {}'.format(__class__.__name__, 'test_view_create_city4k', end - start))
-
-    def test_view_create_lion4k(self):
-        stdimage = StdImage.objects.create()
-        start = time.time()
-        stdimage.image.save('lion4k.jpg', open('static/images/lion4k.jpg', 'rb'))
-        end = time.time()
-        print('{}.{} time {}'.format(__class__.__name__, 'test_view_create_lion4k', end - start))
-
-    def test_view_create_machine4k(self):
-        stdimage = StdImage.objects.create()
-        start = time.time()
-        stdimage.image.save('machine4k.png', open('static/images/machine4k.png', 'rb'))
-        end = time.time()
-        print('{}.{} time {}'.format(__class__.__name__, 'test_view_create_machine4k', end - start))
-
-    def test_view_create_colored_frog(self):
-        stdimage = StdImage.objects.create()
-        start = time.time()
-        stdimage.image.save('colored_frog.jpg', open('static/images/colored_frog.jpg', 'rb'))
-        end = time.time()
-        print('{}.{} time {}'.format(__class__.__name__, 'test_view_create_colored_frog', end - start))
+            new_path = os.path.join(self.media_root, stdimage.image.thumbnail.url)
+            data.append([test_name, image, end - start, os.path.getsize(path), os.path.getsize(new_path)])
+        print(tabulate(data, headers=['Test', 'ImageName', 'Time', 'Size', 'New Size'], tablefmt='orgtbl'))
 
     def tearDown(self):
-        super(TestStdImageView, self).tearDown()
+        super(TestImagesView, self).tearDown()
         clean_folder('media')
