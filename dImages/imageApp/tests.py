@@ -34,34 +34,32 @@ class TestImagesView(TestCase):
         data = []
         for image in self.images:
             path = os.path.join(self.root, image)
-            image_file = open(path, 'rb')
-
-            imagekit = ImageKit.objects.create()
-            start = time.time()
-            imagekit.image.save(image, image_file)
-            imagekit.thumbnail.save(image, image_file)
-            end = time.time()
-
+            with open(path, 'rb') as image_file:
+                imagekit = ImageKit.objects.create()
+                start = time.time()
+                imagekit.image.save(image, image_file)
+                imagekit.thumbnail.save(image, image_file)
+                end = time.time()
             new_path = os.path.join(self.media_root, imagekit.thumbnail.url)
             data.append([test_name, image, end - start, os.path.getsize(path), os.path.getsize(new_path)])
         print(tabulate(data, headers=['Test', 'ImageName', 'Time', 'Size', 'New Size'], tablefmt='orgtbl'))
+        print('\n')
 
     def test_stdimage(self):
         test_name = '{}.{}'.format(__class__.__name__, 'test_stdimage')
         data = []
         for image in self.images:
             path = os.path.join(self.root, image)
-            image_file = open(path, 'rb')
-
-            stdimage = StdImage.objects.create()
-            start = time.time()
-            stdimage.image.save(image, image_file)
-            end = time.time()
-
+            with open(path, 'rb') as image_file:
+                stdimage = StdImage.objects.create()
+                start = time.time()
+                stdimage.image.save(image, image_file)
+                end = time.time()
             new_path = os.path.join(self.media_root, stdimage.image.thumbnail.url)
             data.append([test_name, image, end - start, os.path.getsize(path), os.path.getsize(new_path)])
         print(tabulate(data, headers=['Test', 'ImageName', 'Time', 'Size', 'New Size'], tablefmt='orgtbl'))
+        print('\n')
 
     def tearDown(self):
         super(TestImagesView, self).tearDown()
-        clean_folder('media')
+        # clean_folder('media')

@@ -2,6 +2,7 @@ from django.db import models
 from imagekit.models import ProcessedImageField
 from imagekit.processors import SmartResize
 from stdimage import StdImageField
+from stdimage.utils import UploadToAutoSlugClassNameDir
 
 
 def get_image_path(instance, filename):
@@ -17,5 +18,5 @@ class ImageKit(models.Model):
 
 
 class StdImage(models.Model):
-    image = StdImageField(upload_to=get_image_path,
+    image = StdImageField(upload_to=UploadToAutoSlugClassNameDir(populate_from='id'),
                           variations={'thumbnail': {'width': 200, 'height': 200, 'crop': True}})
