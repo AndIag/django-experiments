@@ -20,3 +20,10 @@ class ImageKit(models.Model):
 class StdImage(models.Model):
     image = StdImageField(upload_to=UploadToAutoSlugClassNameDir(populate_from='id'),
                           variations={'thumbnail': {'width': 200, 'height': 200, 'crop': True}})
+
+    def save(self, *args, **kwargs):
+        if not self.id and self.image:
+            image = self.image
+            self.image = None
+            super(StdImage, self).save(*args, **kwargs)
+            self.image.save(image.name, image)

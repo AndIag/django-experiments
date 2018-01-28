@@ -3,10 +3,14 @@ import os
 import time
 
 from django.test import TestCase
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APIRequestFactory
 from tabulate import tabulate
 
 from dImages import settings
 from imageApp.models import ImageKit, StdImage
+from imageApp.views import UploadImagesView
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +31,6 @@ class TestImagesView(TestCase):
         self.root = 'static'
         self.media_root = settings.MEDIA_ROOT
         self.images = os.listdir(self.root)
-        self.data = []
 
     def test_imagekit(self):
         test_name = '{}.{}'.format(__class__.__name__, 'test_imagekit')
@@ -62,4 +65,28 @@ class TestImagesView(TestCase):
 
     def tearDown(self):
         super(TestImagesView, self).tearDown()
-        # clean_folder('media')
+        clean_folder(self.media_root)
+
+
+class TestUploadToAutoSlugClassNameDir(TestCase):
+
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.view = UploadImagesView.as_view()
+        self.root = 'static'
+        self.media_root = settings.MEDIA_ROOT
+        self.images = os.listdir(self.root)
+
+    def test_upload_image_in_creation(self):
+        for image in self.images:
+            path = os.path.join(self.root, image)
+            with open(path, 'rb') as image_file:
+                data = {"image": image_file}
+                request = self.factory.post(reverse('images'), data, format="multipart")
+                response = self.view(request)
+
+                self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def tearDown(self):
+        super(TestUploadToAutoSlugClassNameDir, self).tearDown()
+        clean_folder(self.media_root)
