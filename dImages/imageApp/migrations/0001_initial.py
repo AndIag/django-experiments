@@ -24,7 +24,8 @@ class Migration(migrations.Migration):
             name='StdImage',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image', stdimage.models.StdImageField(upload_to=stdimage.utils.UploadToAutoSlugClassNameDir('id'))),
+                ('image', stdimage.models.StdImageField(blank=False, null=False,
+                                                        upload_to=stdimage.utils.UploadToAutoSlugClassNameDir('id'))),
             ],
         ),
     ]
