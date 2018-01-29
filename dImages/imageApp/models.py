@@ -27,3 +27,5 @@ class StdImage(models.Model):
             self.image = None
             super(StdImage, self).save(*args, **kwargs)
             self.image.save(image.name, image)
+            return
+        super(StdImage, self).save(*args, **kwargs)
