@@ -1,25 +1,44 @@
 import os
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from core import configurations
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
+ROOT_URLCONF = 'core.urls'
 SECRET_KEY = configurations.SECRET_KEY
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = configurations.DEBUG
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+LOG_DIR = os.path.join(BASE_DIR, 'core', 'logs')
+
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
 
 ALLOWED_HOSTS = []
 
-ROOT_URLCONF = 'core.urls'
-STATIC_URL = '/static/'
+WSGI_APPLICATION = 'core.wsgi.application'
 
-# Application definition
+DATABASES = configurations.DB_CREDENTIALS
+
+# Internationalization
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
+
+# SSL configuration
+if configurations.FORCE_SSL:
+    # Force SSL in all requests
+    SECURE_SSL_REDIRECT = True
+    SECURE_REDIRECT_EXEMPT = []
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    # Force HSTS header
+    # https://docs.djangoproject.com/en/2.0/ref/middleware/#http-strict-transport-security
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_PRELOAD = True
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -43,8 +62,7 @@ MIDDLEWARE = [
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [os.path.join(STATIC_ROOT, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -57,48 +75,17 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'core.wsgi.application'
-
-# Database
-# https://docs.djangoproject.com/en/2.0/ref/settings/#databases
-
-DATABASES = configurations.DB_CREDENTIALS
-
-# Password validation
-# https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 4
+        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
 ]
-
-# Internationalization
-# https://docs.djangoproject.com/en/2.0/topics/i18n/
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-USE_I18N = True
-USE_L10N = True
-USE_TZ = True
-
-# SSL configuration
-if configurations.FORCE_SSL:
-    # Force SSL in all requests
-    SECURE_SSL_REDIRECT = True
-    SECURE_REDIRECT_EXEMPT = []
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    # Force HSTS header
-    # https://docs.djangoproject.com/en/2.0/ref/middleware/#http-strict-transport-security
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_PRELOAD = True
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True

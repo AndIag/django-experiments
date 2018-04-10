@@ -43,7 +43,7 @@ fabric.properties
 
 # Custom ignored files
 
-credentials.py
+**/credentials.py
 /media/
 *.log
 /htmlcov/*
