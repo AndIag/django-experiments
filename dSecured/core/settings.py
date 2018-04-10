@@ -13,7 +13,7 @@ LOG_DIR = os.path.join(BASE_DIR, 'core', 'logs')
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = configurations.ALLOWED_HOSTS
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
@@ -25,6 +25,16 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+
+# CORS configuration
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = ALLOWED_HOSTS + configurations.CORS_WHITELIST
+CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS
+if DEBUG:  # If we are debugging include Django host and Angular2 host
+    CORS_ORIGIN_WHITELIST.append('localhost:8080')
+    CORS_ORIGIN_WHITELIST.append('localhost:4200')
+CORS_ALLOW_METHODS = ('DELETE', 'GET', 'POST', 'PUT', 'OPTIONS')
+CORS_ALLOW_HEADERS = ('accept', 'authorization', 'content-type')
 
 # SSL configuration
 if configurations.FORCE_SSL:
@@ -47,13 +57,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'admin_honeypot',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsPostCsrfMiddleware',  # Required if CORS and CRSF are enabled
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
