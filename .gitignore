@@ -43,10 +43,10 @@ fabric.properties
 
 # Custom ignored files
 
-/Service/configurations.py
+credentials.py
 /media/
 *.log
 /htmlcov/*
 /.coverage
 .idea/
-venv/*
+**/venv/**
