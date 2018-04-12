@@ -7,7 +7,6 @@ SECRET_KEY = configurations.SECRET_KEY
 DEBUG = configurations.DEBUG
 
 WSGI_APPLICATION = 'core.wsgi.application'
-ALLOWED_HOSTS = configurations.ALLOWED_HOSTS
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
@@ -33,14 +32,13 @@ USE_TZ = True
 # to WHITELIST from 8080 and 4200 ports.
 #
 # By default whitelist is set as ALLOWED_HOSTS + CORS_WHITELIST
+ALLOWED_HOSTS = configurations.ALLOWED_HOSTS
 CORS_ORIGIN_ALLOW_ALL = DEBUG
-CORS_ORIGIN_WHITELIST = ALLOWED_HOSTS + configurations.CORS_WHITELIST
+if not DEBUG:
+    CORS_ORIGIN_WHITELIST = ALLOWED_HOSTS + configurations.CORS_WHITELIST
+    CORS_ALLOW_METHODS = ('DELETE', 'GET', 'POST', 'PUT', 'OPTIONS')
+    CORS_ALLOW_HEADERS = ('accept', 'authorization', 'content-type', 'accept-language')
 CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS
-if DEBUG:  # If we are debugging include Django host and Angular2 host
-    CORS_ORIGIN_WHITELIST.append('localhost:8080')
-    CORS_ORIGIN_WHITELIST.append('localhost:4200')
-CORS_ALLOW_METHODS = ('DELETE', 'GET', 'POST', 'PUT', 'OPTIONS')
-CORS_ALLOW_HEADERS = ('accept', 'authorization', 'content-type')
 
 # SSL configuration
 # If FORCE_SSL is set to True in configurations.py hard force the use of SSL in all the connections.
@@ -65,6 +63,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'admin_honeypot',
     'corsheaders',
+    'oauth2_provider',
 ]
 
 MIDDLEWARE = [
@@ -109,6 +108,28 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 30,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.ext.rest_framework.OAuth2Authentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'ORDERING_PARAM': 'sort',
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+        'rest_framework.throttling.ScopedRateThrottle'
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '10/minute',
+        'user': '1000/day'
+    }
+}
 
 LOGGING = {
     'version': 1,
